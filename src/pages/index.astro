@@ -2,7 +2,7 @@
 const posts = import.meta.glob('./blog/*.md', { eager: true });
 const sorted = Object.entries(posts).sort(([a], [b]) => b.localeCompare(a));
 ---
-
+---
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
