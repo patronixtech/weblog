@@ -16,20 +16,21 @@ const sorted = Object.entries(posts).sort(([a], [b]) => b.localeCompare(a));
         <p style="color:#555;">Daily tech news brief.</p>
       </header>
 
-      <section>
-        <h2>Latest posts</h2>
-        {sorted.length === 0 && <p>No posts yet.</p>}
-        {sorted.map(([rawPath, post]) => {
-          const slug = rawPath.replace('./blog/', '').replace(/\.md$/, '');
-          const title = post.matter?.title ?? 'Untitled';
-          const date = post.matter?.date ?? '';
-          return (
-            <article style="border-top:1px solid #eee; padding-top:0.75rem; margin-top:0.75rem;">
-              <h3><a href={`/${slug}`}>{title}</a></h3>
-              {date && <div style="color:#777; font-size:0.85rem;">{new Date(date).toDateString()}</div>}
-            </article>
-          );
-        })}
+      <section style="margin-top:2rem;">
+        <h2>Daily Tech Brief</h2>
+        {sorted.length === 0 && <p>No briefs yet.</p>}
+        <ul style="list-style:none; padding:0; margin:0.5rem 0 0 0; display:flex; flex-direction:column; gap:0.5rem;">
+          {sorted.map(([rawPath, post]) => {
+            const slug = rawPath.replace('./blog/', '').replace(/\.md$/, '');
+            const date = post.matter?.date ?? '';
+            const label = date ? new Date(date).toDateString() : slug;
+            return (
+              <li style="border-top:1px solid #eee; padding-top:0.75rem;">
+                <a href={`/${slug}`} style="font-weight:600;">{label}</a>
+              </li>
+            );
+          })}
+        </ul>
       </section>
     </main>
   </body>
