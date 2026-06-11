@@ -26,12 +26,16 @@ const formattedDate = date
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={`PatronixTech briefing: ${title}`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title} | PatronixTech</title>
   </head>
   <body>
     <div class="page-shell">
       <header class="hero compact">
-        <p class="eyebrow">PatronixTech Journal</p>
+        <div class="brand-row">
+          <img class="brand-mark" src="/patronix-logo.svg" alt="PatronixTech logo" />
+          <p class="eyebrow">PatronixTech Journal</p>
+        </div>
         <h1>{title}</h1>
         {formattedDate && <p class="lead">{formattedDate}</p>}
         <div class="hero-actions">
@@ -81,8 +85,19 @@ const formattedDate = date
         color: #9eb0c8;
         font-size: 0.95rem;
       }
+      .brand-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+      }
       .eyebrow {
-        margin: 0 0 10px;
+        margin: 0;
         text-transform: uppercase;
         letter-spacing: 0.24em;
         font-size: 0.78rem;

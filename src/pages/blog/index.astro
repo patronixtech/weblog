@@ -9,12 +9,16 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Daily tech and AI briefings from PatronixTech." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Blog | PatronixTech</title>
   </head>
   <body>
     <div class="page-shell">
       <header class="hero compact">
-        <p class="eyebrow">PatronixTech Journal</p>
+        <div class="brand-row">
+          <img class="brand-mark" src="/patronix-logo.svg" alt="PatronixTech logo" />
+          <p class="eyebrow">PatronixTech Journal</p>
+        </div>
         <h1>Daily technology and AI news, distilled.</h1>
         <p class="lead">Short, useful updates designed for founders, builders, and curious readers who want the signal without the noise.</p>
         <div class="hero-actions">
@@ -93,8 +97,19 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
         padding: 56px 0 36px;
       }
       .hero.compact { padding-bottom: 20px; }
+      .brand-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .brand-mark {
+        width: 40px;
+        height: 40px;
+        border-radius: 13px;
+      }
       .eyebrow {
-        margin: 0 0 8px;
+        margin: 0;
         text-transform: uppercase;
         letter-spacing: 0.24em;
         font-size: 0.78rem;

@@ -17,13 +17,18 @@ const posts = postEntries.slice(1, 4);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="PatronixTech builds practical AI, product, and software experiences for modern teams." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/patronix-logo.svg" />
     <title>PatronixTech | AI, software, and product strategy</title>
   </head>
   <body>
     <div class="page-shell">
       <header class="hero">
         <div class="hero-copy">
-          <p class="eyebrow">PatronixTech</p>
+          <div class="brand-row">
+            <img class="brand-mark" src="/patronix-logo.svg" alt="PatronixTech logo" />
+            <p class="eyebrow">PatronixTech</p>
+          </div>
           <h1>Designing thoughtful AI and software experiences.</h1>
           <p class="lead">
             We help modern teams turn emerging technology into useful products, sharper workflows,
@@ -127,8 +132,20 @@ const posts = postEntries.slice(1, 4);
         align-items: center;
         padding: 48px 0 28px;
       }
+      .brand-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+      }
       .eyebrow {
-        margin: 0 0 10px;
+        margin: 0;
         text-transform: uppercase;
         letter-spacing: 0.24em;
         font-size: 0.78rem;
