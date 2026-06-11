@@ -1,4 +1,6 @@
 ---
+import { formatDate } from '../../utils/date';
+
 export async function getStaticPaths() {
   const posts = await import.meta.glob('../blog/*.md', { eager: true });
   return Object.entries(posts)
@@ -16,9 +18,7 @@ const { post, slug } = Astro.props;
 const { Content } = post;
 const title = post.frontmatter?.title ?? 'Daily Tech Brief';
 const date = post.frontmatter?.date ?? '';
-const formattedDate = date
-  ? new Date(date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
-  : '';
+const formattedDate = date ? formatDate(date) : '';
 ---
 <!doctype html>
 <html lang="en">

@@ -1,10 +1,12 @@
 ---
+import { formatDate, getSortTime } from '../../utils/date';
+
 const posts = Object.entries(import.meta.glob('../blog/*.md', { eager: true }))
   .filter(([, post]) => post.frontmatter?.title)
   .map(([rawPath, post]) => {
     const slug = rawPath.replace('../blog/', '').replace(/\.md$/, '');
     const date = post.frontmatter?.date ?? '';
-    const time = date ? new Date(date).getTime() : 0;
+    const time = getSortTime(date);
     return {
       slug,
       title: post.frontmatter?.title ?? 'Daily Tech Brief',
@@ -43,9 +45,7 @@ const posts = Object.entries(import.meta.glob('../blog/*.md', { eager: true }))
 
           <div class="post-list">
             {posts.map((post) => {
-              const formattedDate = post.date
-                ? new Date(post.date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
-                : post.slug;
+              const formattedDate = post.date ? formatDate(post.date) : post.slug;
               return (
                 <a class="post-card" href={`/briefs/${post.slug}`}>
                   <p class="post-date">{formattedDate}</p>

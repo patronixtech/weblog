@@ -1,7 +1,14 @@
 ---
+import { formatDate, getSortTime } from '../../utils/date';
+
 const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
   .filter(([, post]) => post.frontmatter?.title)
-  .sort(([a], [b]) => b.localeCompare(a));
+  .map(([rawPath, post]) => ({
+    rawPath,
+    post,
+    time: getSortTime(post.frontmatter?.date ?? ''),
+  }))
+  .sort((a, b) => b.time - a.time || b.rawPath.localeCompare(a.rawPath));
 ---
 <!doctype html>
 <html lang="en">
@@ -49,13 +56,11 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
             <p class="empty">No briefs published yet.</p>
           ) : (
             <div class="post-list">
-              {posts.map(([rawPath, post]) => {
+              {posts.map(({ rawPath, post }) => {
                 const slug = rawPath.replace('./', '').replace(/\.md$/, '');
                 const date = post.frontmatter?.date ?? '';
                 const title = post.frontmatter?.title ?? 'Daily Tech Brief';
-                const formattedDate = date
-                  ? new Date(date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : slug;
+                const formattedDate = date ? formatDate(date) : slug;
 
                 return (
                   <a class="post-card" href={`/briefs/${slug}`}>
