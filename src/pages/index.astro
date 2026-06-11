@@ -1,5 +1,6 @@
 ---
 import { formatDate, getSortTime } from '../utils/date';
+import { getExcerpt } from '../utils/briefMeta';
 
 const postEntries = Object.entries(import.meta.glob('./blog/*.md', { eager: true }))
   .filter(([, post]) => post.frontmatter?.title)
@@ -7,7 +8,13 @@ const postEntries = Object.entries(import.meta.glob('./blog/*.md', { eager: true
     const slug = rawPath.replace('./blog/', '').replace(/\.md$/, '');
     const date = post.frontmatter?.date ?? '';
     const time = getSortTime(date);
-    return { slug, title: post.frontmatter?.title ?? 'Daily Tech Brief', date, time };
+    return {
+      slug,
+      title: post.frontmatter?.title ?? 'Daily Tech Brief',
+      date,
+      time,
+      excerpt: getExcerpt(post.compiledContent?.() ?? post.rawContent?.() ?? ''),
+    };
   })
   .sort((a, b) => b.time - a.time || b.slug.localeCompare(a.slug));
 const latestPost = postEntries[0];
@@ -81,7 +88,7 @@ const posts = postEntries.slice(1, 4);
             <a class="featured-post" href={`/briefs/${latestPost.slug}`}>
               <span class="post-date">{latestPost.date ? formatDate(latestPost.date) : latestPost.slug}</span>
               <strong>{latestPost.title}</strong>
-              <p>Newest briefing by date.</p>
+              <p>{latestPost.excerpt}</p>
             </a>
           )}
           <div class="post-list">
@@ -95,6 +102,7 @@ const posts = postEntries.slice(1, 4);
                   <a class="post-item" href={`/briefs/${post.slug}`}>
                     <span class="post-date">{formattedDate}</span>
                     <strong>{post.title}</strong>
+                    <span class="post-summary">{post.excerpt}</span>
                   </a>
                 );
               })
