@@ -1,6 +1,5 @@
 ---
 import { formatDate, getSortTime } from '../utils/date';
-import { getExcerpt } from '../utils/briefMeta';
 
 const postEntries = Object.entries(import.meta.glob('./blog/*.md', { eager: true }))
   .filter(([, post]) => post.frontmatter?.title)
@@ -13,12 +12,18 @@ const postEntries = Object.entries(import.meta.glob('./blog/*.md', { eager: true
       title: post.frontmatter?.title ?? 'Daily Tech Brief',
       date,
       time,
-      excerpt: getExcerpt(post.compiledContent?.() ?? post.rawContent?.() ?? ''),
     };
   })
   .sort((a, b) => b.time - a.time || b.slug.localeCompare(a.slug));
 const latestPost = postEntries[0];
 const posts = postEntries.slice(1, 4);
+
+function getDisplayDate(date: string | Date | undefined, slug: string) {
+  const slugDate = formatDate(slug.replace(/^daily-tech-brief-/, ''));
+  if (slugDate) return slugDate;
+
+  return formatDate(date) || slug;
+}
 ---
 <!doctype html>
 <html lang="en">
@@ -86,9 +91,8 @@ const posts = postEntries.slice(1, 4);
           <p class="eyebrow">Latest briefings</p>
           {latestPost && (
             <a class="featured-post" href={`/briefs/${latestPost.slug}`}>
-              <span class="post-date">{latestPost.date ? formatDate(latestPost.date) : latestPost.slug}</span>
               <strong>{latestPost.title}</strong>
-              <p>{latestPost.excerpt}</p>
+              <span class="post-date">{getDisplayDate(latestPost.date, latestPost.slug)}</span>
             </a>
           )}
           <div class="post-list">
@@ -96,13 +100,12 @@ const posts = postEntries.slice(1, 4);
               <p class="muted">New briefs will appear here soon.</p>
             ) : (
               posts.map((post) => {
-                const formattedDate = post.date ? formatDate(post.date) : post.slug;
+                const formattedDate = getDisplayDate(post.date, post.slug);
 
                 return (
                   <a class="post-item" href={`/briefs/${post.slug}`}>
-                    <span class="post-date">{formattedDate}</span>
                     <strong>{post.title}</strong>
-                    <span class="post-summary">{post.excerpt}</span>
+                    <span class="post-date">{formattedDate}</span>
                   </a>
                 );
               })
@@ -238,6 +241,12 @@ const posts = postEntries.slice(1, 4);
       }
       .card h2 { font-size: 1.5rem; margin-bottom: 10px; }
       .card p { color: #d7e0ec; line-height: 1.7; }
+      .featured-post {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 8px;
+      }
       .post-list { display: grid; gap: 10px; margin-top: 12px; }
       .post-item {
         display: flex;
