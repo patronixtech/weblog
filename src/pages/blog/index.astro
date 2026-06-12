@@ -9,6 +9,13 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
     time: getSortTime(post.frontmatter?.date ?? ''),
   }))
   .sort((a, b) => b.time - a.time || b.rawPath.localeCompare(a.rawPath));
+
+function getDisplayDate(date: string | Date | undefined, slug: string) {
+  const formattedDate = formatDate(date);
+  if (formattedDate) return formattedDate;
+
+  return formatDate(slug.replace(/^daily-tech-brief-/, '')) || slug;
+}
 ---
 <!doctype html>
 <html lang="en">
@@ -60,13 +67,12 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
                 const slug = rawPath.replace('./', '').replace(/\.md$/, '');
                 const date = post.frontmatter?.date ?? '';
                 const title = post.frontmatter?.title ?? 'Daily Tech Brief';
-                const formattedDate = date ? formatDate(date) : slug;
+                const formattedDate = getDisplayDate(date, slug);
 
                 return (
                   <a class="post-card" href={`/briefs/${slug}`}>
-                    <p class="post-date">{formattedDate}</p>
                     <h3>{title}</h3>
-                    <p>{post.frontmatter?.description ?? 'A concise roundup of the day’s most relevant technology and AI stories.'}</p>
+                    <p class="post-date">{formattedDate}</p>
                   </a>
                 );
               })}
@@ -198,14 +204,13 @@ const posts = Object.entries(import.meta.glob('./*.md', { eager: true }))
         border-color: rgba(116, 212, 255, 0.5);
       }
       .post-date {
-        margin: 0 0 8px;
+        margin: 8px 0 0;
         color: #74d4ff;
         font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.16em;
       }
-      .post-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
-      .post-card p { margin: 0; color: #c8d2e2; }
+      .post-card h3 { font-size: 1.1rem; }
       .empty { color: #c8d2e2; }
       @media (max-width: 820px) {
         .highlight-card { grid-template-columns: 1fr; }
