@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const blogDir = path.join(__dirname, '..', 'src', 'pages', 'blog');
+const runMarkerPath = path.join(blogDir, '.last-run.json');
 const feedUrl = 'https://news.google.com/rss/search?q=artificial+intelligence&hl=en-US&gl=US&ceid=US:en';
 
 function formatDateParts(date, timeZone = 'America/Chicago') {
@@ -65,47 +66,57 @@ async function main() {
   const targetPath = path.join(blogDir, fileName);
 
   if (await fileExists(targetPath)) {
-    console.log(`Brief already exists for ${today}, skipping.`);
-    return;
+    console.log(`Brief already exists for ${today}, updating run marker only.`);
+  } else {
+    const response = await fetch(feedUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; PatronixBot/1.0)',
+        Accept: 'application/rss+xml, application/xml, text/xml, */*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Feed request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const xml = await response.text();
+    const items = parseItems(xml).slice(0, 5);
+
+    const briefItems = items.length
+      ? items
+      : [
+          {
+            title: 'AI and tech leaders continue to drive product momentum',
+            summary: 'The market is showing a steady shift from experimentation toward deployment and measurable business outcomes.',
+            source: 'PatronixTech analysis',
+          },
+        ];
+
+    const body = briefItems
+      .map((item, index) => {
+        const source = item.source || 'news source';
+        return `\n${index + 1}. **${item.title}**  \n   ${item.summary}  \n   *Source: ${source}*`;
+      })
+      .join('');
+
+    const summary = `The day’s stories point to continued momentum around AI deployment, infrastructure investment, and product adoption.`;
+    const content = `---\ntitle: Daily Tech Brief\ndate: ${today}\n---\n\n**Date:** ${today}\n\n## Top Technology News\n${body}\n\n## Daily Brief Summary\n\n${summary}\n`;
+
+    await mkdir(blogDir, { recursive: true });
+    await writeFile(targetPath, content, 'utf8');
+    console.log(`Created ${fileName}`);
   }
 
-  const response = await fetch(feedUrl, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; PatronixBot/1.0)',
-      Accept: 'application/rss+xml, application/xml, text/xml, */*',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Feed request failed: ${response.status} ${response.statusText}`);
-  }
-
-  const xml = await response.text();
-  const items = parseItems(xml).slice(0, 5);
-
-  const briefItems = items.length
-    ? items
-    : [
-        {
-          title: 'AI and tech leaders continue to drive product momentum',
-          summary: 'The market is showing a steady shift from experimentation toward deployment and measurable business outcomes.',
-          source: 'PatronixTech analysis',
-        },
-      ];
-
-  const body = briefItems
-    .map((item, index) => {
-      const source = item.source || 'news source';
-      return `\n${index + 1}. **${item.title}**  \n   ${item.summary}  \n   *Source: ${source}*`;
-    })
-    .join('');
-
-  const summary = `The day’s stories point to continued momentum around AI deployment, infrastructure investment, and product adoption.`;
-  const content = `---\ntitle: Daily Tech Brief\ndate: ${today}\n---\n\n**Date:** ${today}\n\n## Top Technology News\n${body}\n\n## Daily Brief Summary\n\n${summary}\n`;
+  const marker = {
+    updatedAt: new Date().toISOString(),
+    timezone: 'America/Chicago',
+    date: today,
+    latestBrief: fileName,
+  };
 
   await mkdir(blogDir, { recursive: true });
-  await writeFile(targetPath, content, 'utf8');
-  console.log(`Created ${fileName}`);
+  await writeFile(runMarkerPath, `${JSON.stringify(marker, null, 2)}\n`, 'utf8');
+  console.log(`Updated run marker ${path.basename(runMarkerPath)}`);
 }
 
 main().catch((error) => {
