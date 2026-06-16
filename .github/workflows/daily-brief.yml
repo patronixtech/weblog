@@ -37,3 +37,5 @@ jobs:
           git add -A src/pages/blog
           git commit -m "Update daily brief automation for $(date -u +%F)" || echo "No changes to commit"
           git push
+          # Note: The push to main triggers deploy-pages.yml workflow
+          # which handles building and updating the gh-pages branch for live deployment
