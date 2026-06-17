@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,49 +38,5 @@ jobs:
         with:
           path: ./dist
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-
-      - name: Extract artifact
-        run: |
-          mkdir -p extracted
-          cd extracted
-          tar -xf ../artifact.tar
-
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-repo
-
-      - name: Update gh-pages branch
-        run: |
-          # Clear existing files (keep .git)
-          cd gh-pages-repo
-          find . -maxdepth 1 ! -name .git -delete
-          # Copy new build
-          cp -r ../extracted/* .
-          # Configure git for commit
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Commit if there are changes
-          if ! git diff --quiet; then
-            git add -A
-            git commit -m "Deploy: Build $(date -u +'%Y-%m-%d %H:%M:%S') UTC"
-            git push origin gh-pages
-          else
-            echo "No changes to deploy"
-          fi
-
-      - name: Deploy via GitHub Pages
-        id: deployment
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
