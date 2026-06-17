@@ -39,3 +39,5 @@ jobs:
           git push
           # Note: The push to main triggers deploy-pages.yml workflow
           # which handles building and updating the gh-pages branch for live deployment
+
+# Trigger deploy
