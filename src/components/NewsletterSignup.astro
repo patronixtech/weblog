@@ -1,8 +1,7 @@
 ---
-// Simple email signup component
-// Configure with your form endpoint (Beehiiv, Kit, Tally, etc.)
-const endpoint = "https://www.tally.so/embed/YOUR_FORM_ID"; // Replace with actual endpoint
-const platform = "tally"; // Options: tally, beehiiv, kit, formspree
+// Beehiiv newsletter embed for patronix.beehiiv.com
+const scriptSrc = "https://subscribe-forms.beehiiv.com/v3/loader.js";
+const formId = "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c";
 ---
 
 <div class="newsletter-card" id="newsletter">
@@ -15,26 +14,37 @@ const platform = "tally"; // Options: tally, beehiiv, kit, formspree
         No spam, unsubscribe anytime.
       </p>
     </div>
-    <form
-      class="newsletter-form"
-      method="POST"
-      action={endpoint}
-      target={platform === "tally" ? "_blank" : undefined}
+    <div
+      class="beehiiv-embed"
+      data-beehiiv-form-id={formId}
     >
-      <input
-        type="email"
-        name="email"
-        placeholder="you@example.com"
-        required
-        class="newsletter-input"
-      />
-      <button type="submit" class="btn btn-primary">Subscribe</button>
-    </form>
+      <noscript>
+        <a
+          class="btn btn-primary"
+          href={`https://patronix.beehiiv.com/subscribe/${formId}`}
+        >
+          Subscribe
+        </a>
+      </noscript>
+    </div>
     <p class="newsletter-note">
       Join developers, founders, and operators who read PatronixTech daily.
     </p>
   </div>
 </div>
+
+<script is:inline>
+  (function() {
+    const script = document.createElement("script");
+    script.src = "https://subscribe-forms.beehiiv.com/v3/loader.js";
+    script.setAttribute("data-beehiiv-form", "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c");
+    script.async = true;
+    document.currentScript.parentElement.insertBefore(
+      script,
+      document.currentScript.nextSibling
+    );
+  })();
+</script>
 
 <style>
   .newsletter-card {
