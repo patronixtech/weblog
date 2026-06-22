@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   generate-and-publish:
@@ -37,7 +38,10 @@ jobs:
           git add -A src/pages/blog
           git commit -m "Update daily brief automation for $(date -u +%F)" || echo "No changes to commit"
           git push
-          # Note: The push to main triggers deploy-pages.yml workflow
-          # which handles building and updating the gh-pages branch for live deployment
 
-# Trigger deploy
+      - name: Trigger Deployment Workflow
+        run: |
+          curl -X POST -H "Authorization: token \${{ secrets.GITHUB_TOKEN }}" \\
+               -H "Accept: application/vnd.github+json" \\
+               https://api.github.com/repos/\${{ github.repository }}/actions/workflows/deploy-pages.yml/dispatches \\
+               -d '{"ref":"main"}'
