@@ -1,0 +1,89 @@
+---
+// Simple email signup component
+// Configure with your form endpoint (Beehiiv, Kit, Tally, etc.)
+const endpoint = "https://www.tally.so/embed/YOUR_FORM_ID"; // Replace with actual endpoint
+const platform = "tally"; // Options: tally, beehiiv, kit, formspree
+---
+
+<div class="newsletter-card" id="newsletter">
+  <div class="newsletter-inner">
+    <div class="newsletter-content">
+      <p class="eyebrow">Newsletter</p>
+      <h2>Get the daily brief in your inbox.</h2>
+      <p class="muted">
+        One concise email each morning with the most important AI, software, and tech moves.
+        No spam, unsubscribe anytime.
+      </p>
+    </div>
+    <form
+      class="newsletter-form"
+      method="POST"
+      action={endpoint}
+      target={platform === "tally" ? "_blank" : undefined}
+    >
+      <input
+        type="email"
+        name="email"
+        placeholder="you@example.com"
+        required
+        class="newsletter-input"
+      />
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
+    <p class="newsletter-note">
+      Join developers, founders, and operators who read PatronixTech daily.
+    </p>
+  </div>
+</div>
+
+<style>
+  .newsletter-card {
+    margin-top: 20px;
+    padding: 28px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+  }
+  .newsletter-inner {
+    display: grid;
+    gap: 16px;
+  }
+  .newsletter-content h2 {
+    font-size: 1.4rem;
+    margin: 6px 0 8px;
+    line-height: 1.2;
+  }
+  .newsletter-content p {
+    color: #c8d2e2;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .newsletter-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .newsletter-input {
+    flex: 1 1 220px;
+    padding: 12px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(0, 0, 0, 0.25);
+    color: #f7f9fc;
+    font-size: 0.95rem;
+  }
+  .newsletter-input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .newsletter-note {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #c8d2e2;
+  }
+  @media (max-width: 720px) {
+    .newsletter-card {
+      padding: 20px;
+    }
+  }
+</style>

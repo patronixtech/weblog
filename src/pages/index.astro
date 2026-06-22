@@ -1,5 +1,6 @@
 ---
 import { formatDate, getSortTime } from '../utils/date';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 
 const postEntries = Object.entries(import.meta.glob('./blog/*.md', { eager: true }))
   .filter(([, post]) => post.frontmatter?.title)
@@ -113,6 +114,7 @@ function getDisplayDate(date: string | Date | undefined, slug: string) {
           </div>
           <a class="text-link" href="/blog/archive">View all posts →</a>
         </section>
+        <NewsletterSignup />
       </main>
     </div>
 
