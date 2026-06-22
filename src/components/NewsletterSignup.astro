@@ -91,6 +91,24 @@ const formId = "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c";
     font-size: 0.85rem;
     color: #c8d2e2;
   }
+  .beehiiv-embed {
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .beehiiv-embed :global(.beehiiv-form),
+  .beehiiv-embed :global(.beehiiv-form-container) {
+    background: transparent !important;
+  }
+  .beehiiv-embed :global(input),
+  .beehiiv-embed :global(button) {
+    background: rgba(0, 0, 0, 0.25) !important;
+    color: #f7f9fc !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+  }
+  .beehiiv-embed :global(input::placeholder) {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
   @media (max-width: 720px) {
     .newsletter-card {
       padding: 20px;
