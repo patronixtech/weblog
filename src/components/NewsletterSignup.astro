@@ -1,6 +1,5 @@
 ---
 // Beehiiv newsletter embed for patronix.beehiiv.com
-const scriptSrc = "https://subscribe-forms.beehiiv.com/v3/loader.js";
 const formId = "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c";
 ---
 
@@ -69,23 +68,6 @@ const formId = "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c";
     line-height: 1.6;
     margin: 0;
   }
-  .newsletter-form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .newsletter-input {
-    flex: 1 1 220px;
-    padding: 12px 14px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    background: rgba(0, 0, 0, 0.25);
-    color: #f7f9fc;
-    font-size: 0.95rem;
-  }
-  .newsletter-input::placeholder {
-    color: rgba(255, 255, 255, 0.45);
-  }
   .newsletter-note {
     margin: 0;
     font-size: 0.85rem;
@@ -93,21 +75,6 @@ const formId = "dc362e3b-4a15-4cf7-a086-cc7b522f8a2c";
   }
   .beehiiv-embed {
     border-radius: 16px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
-  }
-  .beehiiv-embed :global(.beehiiv-form),
-  .beehiiv-embed :global(.beehiiv-form-container) {
-    background: transparent !important;
-  }
-  .beehiiv-embed :global(input),
-  .beehiiv-embed :global(button) {
-    background: rgba(0, 0, 0, 0.25) !important;
-    color: #f7f9fc !important;
-    border-color: rgba(255, 255, 255, 0.16) !important;
-  }
-  .beehiiv-embed :global(input::placeholder) {
-    color: rgba(255, 255, 255, 0.45) !important;
   }
   @media (max-width: 720px) {
     .newsletter-card {
