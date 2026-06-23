@@ -31,13 +31,18 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Commit and push changes
+      - name: Commit and Push changes
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A src/pages/blog
-          git commit -m "Update daily brief automation for $(date -u +%F)" || echo "No changes to commit"
-          git push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update daily brief automation for $(date +'%Y-%m-%d')"
+          
+          # Fetch remote changes and rebase your new commit on top of them
+          git pull --rebase origin main
+          
+          git push origin main
 
       - name: Trigger Deployment Workflow
         run: |
