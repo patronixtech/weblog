@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  workflow_run:
+    workflows: ["Daily Brief Publisher"] # Listens to your 6:07 AM workflow
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -17,6 +21,9 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # CRITICAL: Ensures deployment triggers on standard branch pushes OR a SUCCESSFUL daily brief run.
+    # It safely bypasses the check if the event was a standard manual trigger or a code push.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
     steps:
@@ -41,4 +48,4 @@ jobs:
           path: ./dist
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5 # Upgraded to v5 to fix the Node deprecation warning
