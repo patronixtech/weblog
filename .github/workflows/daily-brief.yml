@@ -1,8 +1,8 @@
 name: Daily Brief Publisher
 
 on:
-  schedule:
-    - cron: '37 11 * * *' # 6:07 AM US Central Time
+#  schedule:
+#    - cron: '37 11 * * *' # 6:07 AM US Central Time
   workflow_dispatch:
 
 permissions:
