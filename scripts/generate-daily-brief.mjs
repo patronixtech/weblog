@@ -32,25 +32,6 @@ function stripHtml(input = '') {
     .trim();
 }
 
-function parseItems(xml) {
-  const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
-
-  return itemMatches.map((match) => {
-    const item = match[1];
-    const title = stripHtml((item.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || 'Untitled story');
-    const description = stripHtml((item.match(/<description>([\s\S]*?)<\/description>/) || [])[1] || '');
-    const link = (item.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '';
-    const source = (item.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || '';
-
-    return {
-      title,
-      summary: description || title,
-      link,
-      source: stripHtml(source) || (link ? new URL(link).hostname : 'news source'),
-    };
-  });
-}
-
 async function fileExists(pathname) {
   try {
     await access(pathname);
@@ -58,6 +39,68 @@ async function fileExists(pathname) {
   } catch {
     return false;
   }
+}
+
+async function fetchArticleSummary(url, timeoutMs = 8000) {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; PatronixBot/1.0)',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+
+    if (!response.ok) {
+      return '';
+    }
+
+    const html = await response.text();
+    const text = stripHtml(html);
+
+    const sentences = text.split(/(?<=[.!?])\s+/).filter((segment) => segment.length > 60 && segment.length < 500);
+    const cleaned = [...new Set(sentences)].slice(0, 4).join(' ').trim();
+
+    if (!cleaned) {
+      return '';
+    }
+
+    return cleaned.length > 320 ? `${cleaned.slice(0, 317)}...` : cleaned;
+  } catch {
+    return '';
+  }
+}
+
+async function parseItems(xml) {
+  const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+
+  return Promise.all(
+    itemMatches.map(async (match) => {
+      const item = match[1];
+      const title = stripHtml((item.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || 'Untitled story');
+      const description = stripHtml((item.match(/<description>([\s\S]*?)<\/description>/) || [])[1] || '');
+      const link = (item.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '';
+      const source = stripHtml((item.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || '');
+
+      const normalizedTitle = title.trim();
+      const looksLikePlaceholder = !description || description.toLowerCase() === normalizedTitle.toLowerCase();
+
+      let summary = description;
+      if (looksLikePlaceholder && link) {
+        summary = await fetchArticleSummary(link);
+      }
+      if (!summary) {
+        summary = normalizedTitle;
+      }
+
+      return {
+        title: normalizedTitle,
+        summary,
+        link,
+        source: stripHtml(source) || (link ? new URL(link).hostname : 'news source'),
+      };
+    }),
+  );
 }
 
 async function main() {
@@ -80,7 +123,7 @@ async function main() {
     }
 
     const xml = await response.text();
-    const items = parseItems(xml).slice(0, 5);
+    const items = (await parseItems(xml)).slice(0, 5);
 
     const briefItems = items.length
       ? items
@@ -99,7 +142,7 @@ async function main() {
       })
       .join('');
 
-    const summary = `The day’s stories point to continued momentum around AI deployment, infrastructure investment, and product adoption.`;
+    const summary = `The day's stories point to continued momentum around AI deployment, infrastructure investment, and product adoption.`;
     const content = `---\ntitle: Daily Tech Brief\ndate: ${today}\n---\n\n**Date:** ${today}\n\n## Top Technology News\n${body}\n\n## Daily Brief Summary\n\n${summary}\n`;
 
     await mkdir(blogDir, { recursive: true });
