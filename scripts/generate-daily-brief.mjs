@@ -82,22 +82,14 @@ async function parseItems(xml) {
       const link = (item.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '';
       const source = stripHtml((item.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || '');
 
-      const normalizedTitle = title.trim();
-      const looksLikePlaceholder = !description || description.toLowerCase() === normalizedTitle.toLowerCase();
-
-      let summary = description;
-      if (looksLikePlaceholder && link) {
-        summary = await fetchArticleSummary(link);
-      }
-      if (!summary) {
-        summary = normalizedTitle;
-      }
+      const fetched = link ? await fetchArticleSummary(link) : '';
+      const summary = fetched || description.trim() || title.trim();
 
       return {
-        title: normalizedTitle,
-        summary,
+        title,
         link,
         source: stripHtml(source) || (link ? new URL(link).hostname : 'news source'),
+        summary,
       };
     }),
   );
