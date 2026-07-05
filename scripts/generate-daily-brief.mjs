@@ -41,6 +41,23 @@ async function fileExists(pathname) {
   }
 }
 
+const NOISE_FRAGMENTS = [
+  'SPDX-License-Identifier',
+  'Copyright ',
+  'All rights reserved',
+  'github.com',
+  'google.com',
+  'googleapis.com',
+  'gstatic.com',
+  'schema.org',
+  'xmlns:',
+];
+
+function looksLikeNoise(text = '') {
+  const lower = text.toLowerCase();
+  return NOISE_FRAGMENTS.some((fragment) => lower.includes(fragment.toLowerCase()));
+}
+
 async function fetchArticleSummary(url, timeoutMs = 8000) {
   try {
     const response = await fetch(url, {
@@ -58,14 +75,22 @@ async function fetchArticleSummary(url, timeoutMs = 8000) {
     const html = await response.text();
     const text = stripHtml(html);
 
-    const sentences = text.split(/(?<=[.!?])\s+/).filter((segment) => segment.length > 60 && segment.length < 500);
-    const cleaned = [...new Set(sentences)].slice(0, 4).join(' ').trim();
+    const sentences = text
+      .split(/(?<=[.!?])\s+/)
+      .map((s) => s.trim())
+      .filter((segment) => {
+        const len = segment.length;
+        if (len < 60 || len > 500) {
+          return false;
+        }
+        if (looksLikeNoise(segment)) {
+          return false;
+        }
+        return true;
+      });
 
-    if (!cleaned) {
-      return '';
-    }
-
-    return cleaned.length > 320 ? `${cleaned.slice(0, 317)}...` : cleaned;
+    const unique = [...new Set(sentences)].slice(0, 4).join(' ').trim();
+    return unique || '';
   } catch {
     return '';
   }
@@ -82,14 +107,18 @@ async function parseItems(xml) {
       const link = (item.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '';
       const source = stripHtml((item.match(/<source[^>]*>([\s\S]*?)<\/source>/) || [])[1] || '');
 
-      const fetched = link ? await fetchArticleSummary(link) : '';
-      const summary = fetched || description.trim() || title.trim();
+      const titleNorm = title.trim();
+      const descClean = description.trim();
+      const isPlaceholder = !descClean || descClean.toLowerCase() === titleNorm.toLowerCase();
+
+      const fetchedText = (isPlaceholder && link) ? await fetchArticleSummary(link) : '';
+      const summary = (fetchedText && fetchedText !== titleNorm) ? fetchedText : descClean || titleNorm;
 
       return {
-        title,
+        title: titleNorm,
+        summary,
         link,
         source: stripHtml(source) || (link ? new URL(link).hostname : 'news source'),
-        summary,
       };
     }),
   );
